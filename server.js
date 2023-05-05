@@ -77,3 +77,7 @@ io.on("connection", (socket) => {
     console.error(`Failed to connect to Redis or start Socket.IO server: ${error}`);
   }
 })();
+
+When a client connects to the server, the server generates a driverId value from the driver_id query parameter of the socket handshake. It then uses the Redis pubClient to store the socket.id value of the socket object, associated with the driverId. The server then emits a welcome event to the client with a message confirming that the connection was successful.
+
+The server also listens for the orderAccepted event from the client. When it receives this event, it extracts a routeId value from the orderId parameter. It then connects to the MongoDB database using the MongoClient and retrieves a list of driver IDs associated with the routeId value. For each driver ID, except for the one associated with the current socket connection, the server retrieves the corresponding socketId value from the Redis pubClient. It then uses the io instance to emit a refreshAvailable event to the corresponding socket, passing the orderId value as the payload.
