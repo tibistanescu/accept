@@ -1,14 +1,13 @@
-This will be implemented as a microservice with nodejs, express, Socket.IO , redis adapter, redis, kubernetes.
+# Project Title
 
-Redis adapter with Kubernetes is used for scaling.
+A microservice built with Node.js, Express, Socket.IO, Redis adapter, Redis, and Kubernetes.
 
-Redis service is used for storage
+## Overview
 
-Auth is done using a token sent from client with Socket.io handshake. // const socket = io("https://...", {transports: ["websocket"], auth: {token: "abcd"}, query:{driver_id: "12345"}});
+This microservice uses a Redis adapter with Kubernetes for scaling and Redis service for storage. Authentication is done using a token sent from the client with Socket.IO handshake. After a client connects to the server, the server stores driverId - socket.id pair (values from the socket handshake) in the Redis database. The server then listens for the orderAccepted event from all connected clients.
 
-After a client connects to the server, the server stores driverId - socket.id pair (values from the socket handshake) in the Redis db.
+When it receives this event, it connects to the MongoDB database and retrieves a list of driver IDs associated with the accepted routeId value. For each driver ID, except for the one associated with the current socket connection, the server retrieves the corresponding socketId value from Redis. It then uses the io instance to emit a refreshAvailable event to the corresponding sockets, passing the orderId value as the payload.
 
-The server then listens for the orderAccepted event from all connected clients. The clients send the order id in the orderAccepted event: // socket.volatile..emit.('orderAccepted', 'PK-123-456'); When it receives this event, it connects to the MongoDB database and retrieves a list of driver IDs associated with the accepted routeId value. For each driver ID, except for the one associated with the current socket connection, the server retrieves the corresponding socketId value from Redis. It then uses the io instance to emit a refreshAvailable event to the corresponding sockets, passing the orderId value as the payload.
 
 #install:
 
